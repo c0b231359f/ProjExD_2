@@ -56,11 +56,27 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
         bb_imgs.append(bb_img)
     return bb_imgs, accs
 
+def get_kk_img(sum_mv: tuple[int, int])-> pg.Surface:
+    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    # r_kk_img = py.transform.flip(kk_img, True, False)
+    kk_dct = {
+        (+5, +5):pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 0.9),
+        (-5, +0):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9),
+        (-5, -5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 0.9),
+        (+0, -5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 90, 0.9),
+        (+5, -5):pg.transform.flip(pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 0.9), True, False),
+        (+5, 0):pg.transform.flip(pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9), True, False),
+        (+5, +5):pg.transform.flip(pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 0.9), True, False),
+        (+0, +5):pg.transform.flip(pg.transform.rotozoom(pg.image.load("fig/3.png"), 90, 0.9), True, False),
+    }
+    return kk_dct[sum_mv]
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    # kk_img = get_kk_img((0,5))
 
     #移動の辞書
     delta = {
@@ -109,12 +125,12 @@ def main():
                 sum_mv[1] += tpl[1]
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
-
         yoko, tate = check_bound(bb_rct)
         if not yoko:
             v_x *= -1
         if not tate:
             v_y *= -1
+
         avx = v_x * bb_accs[min(tmr//500, 9)]
         avy = v_y * bb_accs[min(tmr//500, 9)]
         bb_img = bb_imgs[min(tmr//500, 9)]
@@ -129,6 +145,7 @@ def main():
             return 
 
         #画面の更新
+        # kk_img = get_kk_img((0, 5))
         pg.display.update()
         tmr += 1
         clock.tick(50)
