@@ -71,6 +71,10 @@ def main():
         if not tate:
             v_y *= -1
 
+        if kk_rct.colliderect(bb_rct):
+            print("game over")
+            return 
+
         bb_rct.move_ip(v_x, v_y)
 
         kk_rct.move_ip(sum_mv)
