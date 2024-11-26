@@ -42,6 +42,20 @@ def gameover(screen:pg.Surface) -> None:
     screen.blit(cry_img, cry_rct_left)
     screen.blit(cry_img, cry_rct_right)
 
+    pg.display.update()
+    time.sleep(2)
+
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    #速度, 大きさの変更
+    accs = [a for a in range(1, 11)]
+    bb_imgs = []
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_img.set_colorkey((0,0,0))
+        bb_imgs.append(bb_img)
+    return bb_imgs, accs
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -73,6 +87,9 @@ def main():
     #タイマーの設定
     clock = pg.time.Clock()
     tmr = 0
+
+    bb_imgs, bb_accs = init_bb_imgs()
+
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -92,20 +109,23 @@ def main():
                 sum_mv[1] += tpl[1]
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
+
         yoko, tate = check_bound(bb_rct)
         if not yoko:
             v_x *= -1
         if not tate:
             v_y *= -1
-        bb_rct.move_ip(v_x, v_y)
+        avx = v_x * bb_accs[min(tmr//500, 9)]
+        avy = v_y * bb_accs[min(tmr//500, 9)]
+        bb_img = bb_imgs[min(tmr//500, 9)]
+        bb_rct.move_ip(avx, avy)
+
         kk_rct.move_ip(sum_mv)
 
         #ゲームオーバー処理
         if kk_rct.colliderect(bb_rct):
             print("game over")
             gameover(screen)
-            pg.display.update()
-            time.sleep(2)
             return 
 
         #画面の更新
