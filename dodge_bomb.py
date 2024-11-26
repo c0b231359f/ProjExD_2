@@ -9,6 +9,9 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 #衝突判定
 def check_bound(rct:pg.Rect) -> tuple[bool, bool]:
+    """
+    衝突の判定を行う
+    """
     yoko, tate = True, True
     if rct.left < 0 or WIDTH < rct.right:
         yoko = False
@@ -17,7 +20,9 @@ def check_bound(rct:pg.Rect) -> tuple[bool, bool]:
     return yoko, tate
 
 def gameover(screen:pg.Surface) -> None:
-    #ブラックアウト
+    """
+    ブラックアウトを行う関数
+    """
     black = pg.Surface((WIDTH, HEIGHT))
     black.fill((0, 0, 0))
     black.set_alpha(200)
@@ -47,6 +52,9 @@ def gameover(screen:pg.Surface) -> None:
 
 def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     #速度, 大きさの変更
+    """
+    円の速度と大きさの変更を行う関数
+    """
     accs = [a for a in range(1, 11)]
     bb_imgs = []
     for r in range(1, 11):
@@ -57,6 +65,9 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     return bb_imgs, accs
 
 def get_kk_img(sum_mv: tuple[int, int])-> pg.Surface:
+    """
+    こうかとんの向きを変更する関数
+    """
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     # r_kk_img = py.transform.flip(kk_img, True, False)
     kk_dct = {
@@ -145,11 +156,10 @@ def main():
             return 
 
         #画面の更新
-        # kk_img = get_kk_img((0, 5))
+        # kk_img = get_kk_img(sum_mv)
         pg.display.update()
         tmr += 1
         clock.tick(50)
-
 
 if __name__ == "__main__":
     pg.init()
