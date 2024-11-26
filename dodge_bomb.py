@@ -24,23 +24,23 @@ def gameover(screen:pg.Surface) -> None:
     bl_rct = black.get_rect()
     screen.blit(black, bl_rct)
 
-    #泣いているこうかとんの位置
-    x = WIDTH//2
-    y = HEIGHT//2
-    cry_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)
-    cry_rct_right = cry_img.get_rect()
-    cry_rct_right.center = x + 400, y
-    cry_rct_left = cry_img.get_rect()
-    cry_rct_left.center = x - 50, y
-    screen.blit(cry_img, cry_rct_left)
-    screen.blit(cry_img, cry_rct_right)
-
     #game over表示
     text = "game over"
     font = pg.font.Font(None, 100)
     text_color = (255, 255, 255)
     text_surface = font.render(text, True, text_color)
+    x = WIDTH//2 - text_surface.get_width() // 2 
+    y = HEIGHT//2 -text_surface.get_height() // 2
     screen.blit(text_surface, [x, y])
+
+    #泣いているこうかとんの位置
+    cry_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)
+    cry_rct_right = cry_img.get_rect()
+    cry_rct_right.center = x + 400, y+20
+    cry_rct_left = cry_img.get_rect()
+    cry_rct_left.center = x - 50, y+20
+    screen.blit(cry_img, cry_rct_left)
+    screen.blit(cry_img, cry_rct_right)
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -68,7 +68,7 @@ def main():
     bb_rct = bb_img.get_rect()
     bb_rct.center = bb_x, bb_y
     bb_img.set_colorkey((0,0,0))
-    v_x, v_y = +5, +5
+    v_x, v_y = +5, +5 #速度の初期値
 
     #タイマーの設定
     clock = pg.time.Clock()
