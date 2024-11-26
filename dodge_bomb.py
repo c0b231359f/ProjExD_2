@@ -1,6 +1,7 @@
 import os
 import sys
 import pygame as pg
+import random
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -24,8 +25,14 @@ def main():
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
 
-    # bg_rct = bg_img.get_rect()
-    # bg_rct.center = 100, 200
+    #爆弾の表示
+    bb_x = int(random.randint(0, WIDTH))
+    bb_y = int(random.randint(0, HEIGHT))
+    bb_img = pg.Surface((20,20))
+    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
+    bb_rct = bb_img.get_rect()
+    bb_rct.center = bb_x, bb_y
+    bb_img.set_colorkey((0,0,0))
 
     clock = pg.time.Clock()
 
@@ -35,6 +42,7 @@ def main():
             if event.type == pg.QUIT: 
                 return
         screen.blit(bg_img, [0, 0]) 
+        screen.blit(bb_img, bb_rct)
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
