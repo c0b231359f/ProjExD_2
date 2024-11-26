@@ -7,6 +7,14 @@ import random
 WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+def check_bound(rct:pg.Rect) -> tuple[bool, bool]:
+    yoko = True
+    tate = True
+    if rct.left < 0 or WIDTH < rct.right:
+        yoko = False
+    if rct.top < 0 or  HEIGHT < rct.bottom:
+        tate = False
+    return yoko, tate
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -34,6 +42,8 @@ def main():
     bb_rct.center = bb_x, bb_y
     bb_img.set_colorkey((0,0,0))
 
+    v_x, v_y = +5, +5
+
     clock = pg.time.Clock()
 
     tmr = 0
@@ -51,6 +61,17 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += tpl[0]
                 sum_mv[1] += tpl[1]
+
+        if check_bound(kk_rct) != (True, True):
+            kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
+
+        yoko, tate = check_bound(bb_rct)
+        if not yoko:
+            v_x *= -1
+        if not tate:
+            v_y *= -1
+
+        bb_rct.move_ip(v_x, v_y)
 
         kk_rct.move_ip(sum_mv)
         screen.blit(kk_img, kk_rct)
