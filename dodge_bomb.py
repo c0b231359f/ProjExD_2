@@ -2,19 +2,45 @@ import os
 import sys
 import pygame as pg
 import random
-
+import time
 
 WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+#衝突判定
 def check_bound(rct:pg.Rect) -> tuple[bool, bool]:
-    yoko = True
-    tate = True
+    yoko, tate = True, True
     if rct.left < 0 or WIDTH < rct.right:
         yoko = False
     if rct.top < 0 or  HEIGHT < rct.bottom:
         tate = False
     return yoko, tate
+
+def gameover(screen:pg.Surface) -> None:
+    #ブラックアウト
+    black = pg.Surface((WIDTH, HEIGHT))
+    black.fill((0, 0, 0))
+    black.set_alpha(200)
+    bl_rct = black.get_rect()
+    screen.blit(black, bl_rct)
+
+    #泣いているこうかとんの位置
+    x = WIDTH//2
+    y = HEIGHT//2
+    cry_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)
+    cry_rct_right = cry_img.get_rect()
+    cry_rct_right.center = x + 400, y
+    cry_rct_left = cry_img.get_rect()
+    cry_rct_left.center = x - 50, y
+    screen.blit(cry_img, cry_rct_left)
+    screen.blit(cry_img, cry_rct_right)
+
+    #game over表示
+    text = "game over"
+    font = pg.font.Font(None, 100)
+    text_color = (255, 255, 255)
+    text_surface = font.render(text, True, text_color)
+    screen.blit(text_surface, [x, y])
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -30,6 +56,7 @@ def main():
             pg.K_RIGHT:(5, 0)
             }
 
+    #こうかとんの表示
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
 
@@ -41,44 +68,47 @@ def main():
     bb_rct = bb_img.get_rect()
     bb_rct.center = bb_x, bb_y
     bb_img.set_colorkey((0,0,0))
-
     v_x, v_y = +5, +5
 
+    #タイマーの設定
     clock = pg.time.Clock()
-
     tmr = 0
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+
+        #画像の描画
         screen.blit(bg_img, [0, 0]) 
         screen.blit(bb_img, bb_rct)
+        screen.blit(kk_img, kk_rct)
 
+        #円、こうかとんの移動の設定
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
-
         for key, tpl in delta.items():
             if key_lst[key]:
                 sum_mv[0] += tpl[0]
                 sum_mv[1] += tpl[1]
-
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
-
         yoko, tate = check_bound(bb_rct)
         if not yoko:
             v_x *= -1
         if not tate:
             v_y *= -1
+        bb_rct.move_ip(v_x, v_y)
+        kk_rct.move_ip(sum_mv)
 
+        #ゲームオーバー処理
         if kk_rct.colliderect(bb_rct):
             print("game over")
+            gameover(screen)
+            pg.display.update()
+            time.sleep(2)
             return 
 
-        bb_rct.move_ip(v_x, v_y)
-
-        kk_rct.move_ip(sum_mv)
-        screen.blit(kk_img, kk_rct)
+        #画面の更新
         pg.display.update()
         tmr += 1
         clock.tick(50)
